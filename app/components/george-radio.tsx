@@ -220,7 +220,7 @@ export function GeorgeRadio() {
               Night programming
             </p>
             <p className="mt-5 max-w-[210px] text-sm leading-6 text-white/30">
-              Choose a mood, then enter one of the station&apos;s fictional pilot
+              Choose a mood, then enter one of George&apos;s personal archive
               signals.
             </p>
           </div>
