@@ -52,6 +52,18 @@ export const projects: Project[] = [
     developmentLog: [],
   },
   {
+    title: "George Radio",
+    slug: "george-radio",
+    category: "Design",
+    year: 2026,
+    status: "Building",
+    description: "A personal late-night radio station inside George Universe.",
+    cover: null,
+    gallery: [],
+    links: [],
+    developmentLog: [],
+  },
+  {
     title: "Shenzhen Jazz Bar",
     slug: "shenzhen-jazz-bar",
     category: "Films",

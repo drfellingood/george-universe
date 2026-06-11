@@ -3,6 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { projects, type ProjectStatus } from "../../../data/projects"
+import { GeorgeRadio } from "../../components/george-radio"
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>
@@ -39,6 +40,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   if (!project) {
     notFound()
+  }
+
+  if (project.slug === "george-radio") {
+    return <GeorgeRadio />
   }
 
   const archiveNumber = projects.findIndex((item) => item.slug === slug) + 1
