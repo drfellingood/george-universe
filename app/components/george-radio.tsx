@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import {
   radioMoods,
   radioSongs,
@@ -35,6 +35,7 @@ const roadmap = [
 ] as const
 
 export function GeorgeRadio() {
+  const audioRef = useRef<HTMLAudioElement>(null)
   const [selectedSong, setSelectedSong] = useState<RadioSong>(radioSongs[0])
   const [selectedMood, setSelectedMood] = useState<(typeof radioMoods)[number]>(
     "All Signals",
@@ -51,21 +52,56 @@ export function GeorgeRadio() {
     setIsPlaying(false)
 
     if (mood === "All Signals") {
-      setSelectedSong(radioSongs[0])
+      chooseSong(radioSongs[0])
       return
     }
 
     const firstSong = radioSongs.find((song) => song.mood === mood)
-    if (firstSong) setSelectedSong(firstSong)
+    if (firstSong) chooseSong(firstSong)
   }
 
   function chooseSong(song: RadioSong) {
+    const audio = audioRef.current
+    if (audio) {
+      audio.pause()
+      audio.currentTime = 0
+    }
+
     setSelectedSong(song)
     setIsPlaying(false)
   }
 
+  async function togglePlayback() {
+    const audio = audioRef.current
+
+    if (!selectedSong.audioUrl || !audio) {
+      setIsPlaying(false)
+      return
+    }
+
+    if (isPlaying) {
+      audio.pause()
+      return
+    }
+
+    try {
+      await audio.play()
+    } catch {
+      setIsPlaying(false)
+    }
+  }
+
   return (
     <main className="min-h-[calc(100vh-73px)] bg-[#050505] text-[#e7e2d7]">
+      <audio
+        ref={audioRef}
+        src={selectedSong.audioUrl ?? undefined}
+        preload="metadata"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
+        onError={() => setIsPlaying(false)}
+      />
       <header className="relative overflow-hidden border-b border-white/10 px-6 pb-16 pt-10 md:px-10 md:pb-24 md:pt-14 lg:px-14">
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <span className="whitespace-nowrap text-[23vw] font-black tracking-[-0.1em] text-white/[0.018]">
@@ -148,7 +184,7 @@ export function GeorgeRadio() {
           <div className="mt-10 grid gap-6 border-y border-white/10 py-6 md:grid-cols-[auto_1fr_auto] md:items-center">
             <button
               type="button"
-              onClick={() => setIsPlaying((playing) => !playing)}
+              onClick={togglePlayback}
               aria-label={isPlaying ? "Pause visual broadcast" : "Play visual broadcast"}
               className="flex h-16 w-16 items-center justify-center rounded-full border border-white/25 text-sm transition hover:bg-[#e7e2d7] hover:text-black"
             >
@@ -156,24 +192,66 @@ export function GeorgeRadio() {
             </button>
 
             <div>
-              <div className="flex h-8 items-end gap-1" aria-hidden="true">
-                {[3, 7, 4, 10, 6, 12, 5, 9, 4, 8, 3, 6, 11, 5, 8, 4].map(
-                  (height, index) => (
-                    <span
-                      key={`${height}-${index}`}
-                      className={`w-full bg-[#d4bd8a]/50 transition-all ${
-                        isPlaying ? "opacity-100" : "opacity-25"
-                      }`}
-                      style={{ height: `${height * 2}px` }}
-                    />
-                  ),
-                )}
+              <div
+                className={`relative h-8 overflow-hidden transition-opacity duration-700 ${
+                  isPlaying ? "opacity-100" : "opacity-30"
+                }`}
+                aria-hidden="true"
+              >
+                <div
+                  className={`absolute left-1/2 top-1/2 h-8 w-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d4bd8a]/10 blur-xl ${
+                    isPlaying
+                      ? "animate-[pulse_4s_ease-in-out_infinite]"
+                      : ""
+                  }`}
+                />
+                <svg
+                  viewBox="0 0 600 32"
+                  preserveAspectRatio="none"
+                  className="absolute inset-0 h-full w-full"
+                >
+                  <path
+                    d="M0 16 C72 16 86 14 126 14 C166 14 178 20 218 20 C258 20 270 10 310 10 C350 10 366 18 406 18 C446 18 464 15 504 15 C544 15 560 16 600 16"
+                    fill="none"
+                    stroke="rgba(212,189,138,0.22)"
+                    strokeWidth="1"
+                  />
+                  <path
+                    d="M0 16 C72 16 86 14 126 14 C166 14 178 20 218 20 C258 20 270 10 310 10 C350 10 366 18 406 18 C446 18 464 15 504 15 C544 15 560 16 600 16"
+                    fill="none"
+                    stroke="rgba(212,189,138,0.75)"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeDasharray="60 540"
+                  >
+                    {isPlaying && (
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        from="0"
+                        to="-600"
+                        dur="7s"
+                        repeatCount="indefinite"
+                      />
+                    )}
+                  </path>
+                </svg>
+                <span
+                  className={`absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d4bd8a] shadow-[0_0_16px_rgba(212,189,138,0.75)] ${
+                    isPlaying
+                      ? "animate-[pulse_3s_ease-in-out_infinite]"
+                      : ""
+                  }`}
+                />
               </div>
               <div className="mt-3 h-px bg-white/10">
                 <div className={`h-px bg-[#d4bd8a] ${isPlaying ? "w-2/5" : "w-0"}`} />
               </div>
               <p className="mt-3 text-[9px] uppercase tracking-[0.25em] text-white/25">
-                Prototype control / no audio connected
+                {selectedSong.audioUrl
+                  ? isPlaying
+                    ? "Playing local signal"
+                    : "Local signal ready"
+                  : "Audio preview unavailable"}
               </p>
             </div>
 

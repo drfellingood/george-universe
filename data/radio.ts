@@ -21,6 +21,16 @@ export type RadioSong = {
 
 export const radioSongs: RadioSong[] = [
   {
+    id: "midnight-skylines-george",
+    title: "Midnight Skylines",
+    artist: "George",
+    genre: "Late-Night Electronic",
+    mood: "After Hours",
+    cover: "/radio/covers/midnight-skylines.jpg",
+    audioUrl: "/radio/audio/midnight-skylines.mp3",
+    note: "A night drive beneath an imagined city skyline, created by George with Suno.",
+  },
+  {
     id: "curious-rich-brian",
     title: "Curious",
     artist: "Rich Brian",
